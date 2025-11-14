@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Energie_TV – Live-Stats</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef2ff;
+            margin: 0;
+            padding: 25px;
+        }
+        .box {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 550px;
+            margin: auto;
+            box-shadow: 0 0 12px rgba(0,0,0,0.15);
+        }
+        h1 { text-align: center; }
+        .stats { font-size: 1.2em; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h1>⚡ Energie_TV – Kanalstatistik</h1>
+    <p class="stats">🔔 Abonnenten: <span id="subs">…</span></p>
+    <p class="stats">▶️ Gesamtaufrufe: <span id="views">…</span></p>
+    <p class="stats">🎥 Videos: <span id="videos">…</span></p>
+</div>
+
+<script>
+    // Dein API-Key
+    const API_KEY = "AIzaSyB946JgAit5jZ6SUBEDxgV91_9SsxgJVs8";
+
+    // Handle deines Kanals
+    const handle = "Energie_TV";
+    const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&forUsername=${handle}&key=${API_KEY}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.items && data.items.length > 0) {
+                const stats = data.items[0].statistics;
+                document.getElementById("subs").textContent = stats.subscriberCount;
+                document.getElementById("views").textContent = stats.viewCount;
+                document.getElementById("videos").textContent = stats.videoCount;
+            } else {
+                document.getElementById("subs").textContent = "Kanal nicht gefunden";
+                document.getElementById("views").textContent = "-";
+                document.getElementById("videos").textContent = "-";
+            }
+        })
+        .catch(err => console.error("Fehler beim Laden:", err));
+</script>
+
+</body>
+</html>
