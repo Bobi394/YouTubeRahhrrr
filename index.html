@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Energie_TV – Live-Stats</title>
+    <title>Energie_TV – Live‑Stats</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,38 +32,26 @@
 </div>
 
 <script>
-    const API_KEY = "AIzaSyB946JgAit5jZ6SUBEDxgV91_9SsxgJVs8";
-    const handle = "Energie_TV";
+    const API_KEY = "AIzaSyB946JgAit5jZ6SUBEDxgV91_9SsxgJVs8"; // dein Key
+    const CHANNEL_ID = "UCO2WbZs_ERYrTJyRc3rm3Eg"; // dein Kanal
 
-    // 1️⃣ Kanal-ID über Handle abrufen
-    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${handle}&type=channel&key=${API_KEY}`;
+    const statsUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`;
 
-    fetch(searchUrl)
+    fetch(statsUrl)
         .then(res => res.json())
         .then(data => {
             if (data.items && data.items.length > 0) {
-                const channelId = data.items[0].snippet.channelId;
-
-                // 2️⃣ Kanal-Statistiken abrufen
-                const statsUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${API_KEY}`;
-
-                fetch(statsUrl)
-                    .then(res => res.json())
-                    .then(statsData => {
-                        const stats = statsData.items[0].statistics;
-                        document.getElementById("subs").textContent = stats.subscriberCount;
-                        document.getElementById("views").textContent = stats.viewCount;
-                        document.getElementById("videos").textContent = stats.videoCount;
-                    })
-                    .catch(err => console.error("Fehler beim Laden der Statistiken:", err));
-
+                const stats = data.items[0].statistics;
+                document.getElementById("subs").textContent = stats.subscriberCount;
+                document.getElementById("views").textContent = stats.viewCount;
+                document.getElementById("videos").textContent = stats.videoCount;
             } else {
                 document.getElementById("subs").textContent = "Kanal nicht gefunden";
                 document.getElementById("views").textContent = "-";
                 document.getElementById("videos").textContent = "-";
             }
         })
-        .catch(err => console.error("Fehler beim Abrufen der Kanal-ID:", err));
+        .catch(err => console.error("Fehler beim Laden:", err));
 </script>
 
 </body>
