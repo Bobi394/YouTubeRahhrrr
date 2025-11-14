@@ -1,57 +1,118 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Energie_TV – Live‑Stats</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #eef2ff;
-            margin: 0;
-            padding: 25px;
-        }
-        .box {
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            max-width: 550px;
-            margin: auto;
-            box-shadow: 0 0 12px rgba(0,0,0,0.15);
-        }
-        h1 { text-align: center; }
-        .stats { font-size: 1.2em; margin: 10px 0; }
-    </style>
+<meta charset="UTF-8">
+<title>Energie_TV – Live Stats</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: #fff;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 2.5em;
+        margin-bottom: 30px;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .stat {
+        margin: 20px 0;
+        text-align: left;
+    }
+
+    .stat-name {
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 1.1em;
+    }
+
+    .bar {
+        height: 25px;
+        width: 0;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #ff512f, #dd2476);
+        text-align: right;
+        padding-right: 10px;
+        line-height: 25px;
+        color: #fff;
+        font-weight: bold;
+        transition: width 1.5s ease-in-out;
+    }
+
+    .icon {
+        margin-right: 10px;
+    }
+
+</style>
 </head>
 <body>
 
-<div class="box">
-    <h1>⚡ Energie_TV – Kanalstatistik</h1>
-    <p class="stats">🔔 Abonnenten: <span id="subs">…</span></p>
-    <p class="stats">▶️ Gesamtaufrufe: <span id="views">…</span></p>
-    <p class="stats">🎥 Videos: <span id="videos">…</span></p>
+<div class="container">
+    <h1>⚡ Energie_TV Stats</h1>
+
+    <div class="stat">
+        <div class="stat-name">🔔 Abonnenten</div>
+        <div id="subsBar" class="bar">0</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-name">▶️ Gesamtaufrufe</div>
+        <div id="viewsBar" class="bar">0</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-name">🎥 Videos</div>
+        <div id="videosBar" class="bar">0</div>
+    </div>
 </div>
 
 <script>
-    const API_KEY = "AIzaSyB946JgAit5jZ6SUBEDxgV91_9SsxgJVs8"; // dein Key
-    const CHANNEL_ID = "UCO2WbZs_ERYrTJyRc3rm3Eg"; // dein Kanal
+    const API_KEY = "AIzaSyB946JgAit5jZ6SUBEDxgV91_9SsxgJVs8";
+    const CHANNEL_ID = "UCO2WbZs_ERYrTJyRc3rm3Eg";
 
-    const statsUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`;
-
-    fetch(statsUrl)
+    fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`)
         .then(res => res.json())
         .then(data => {
-            if (data.items && data.items.length > 0) {
-                const stats = data.items[0].statistics;
-                document.getElementById("subs").textContent = stats.subscriberCount;
-                document.getElementById("views").textContent = stats.viewCount;
-                document.getElementById("videos").textContent = stats.videoCount;
-            } else {
-                document.getElementById("subs").textContent = "Kanal nicht gefunden";
-                document.getElementById("views").textContent = "-";
-                document.getElementById("videos").textContent = "-";
-            }
+            const stats = data.items[0].statistics;
+
+            // Werte holen
+            const subs = parseInt(stats.subscriberCount);
+            const views = parseInt(stats.viewCount);
+            const videos = parseInt(stats.videoCount);
+
+            // Maximalwert für Balken
+            const maxValue = Math.max(subs, views, videos);
+
+            // Balken setzen
+            const subsBar = document.getElementById('subsBar');
+            const viewsBar = document.getElementById('viewsBar');
+            const videosBar = document.getElementById('videosBar');
+
+            subsBar.style.width = `${(subs/maxValue)*100}%`;
+            subsBar.textContent = subs.toLocaleString();
+
+            viewsBar.style.width = `${(views/maxValue)*100}%`;
+            viewsBar.textContent = views.toLocaleString();
+
+            videosBar.style.width = `${(videos/maxValue)*100}%`;
+            videosBar.textContent = videos.toLocaleString();
         })
-        .catch(err => console.error("Fehler beim Laden:", err));
+        .catch(err => console.error(err));
 </script>
 
 </body>
