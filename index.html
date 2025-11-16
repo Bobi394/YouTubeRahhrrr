@@ -3,15 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <title>Energie_TV – Dashboard</title>
+
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
 
     body {
         font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        background: linear-gradient(135deg, #ff6a00, #ee0979, #4a00e0);
+        background-size: 300% 300%;
+        animation: bgMove 12s ease infinite;
         margin: 0;
         padding: 0;
         color: #fff;
+    }
+
+    @keyframes bgMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
     .container {
@@ -25,29 +34,37 @@
         font-size: 3em;
         margin-bottom: 25px;
         font-weight: 700;
-        text-shadow: 0 0 20px rgba(255,255,255,0.3);
+        text-shadow: 0 0 25px rgba(255,255,255,0.4);
     }
 
     .card {
-        background: rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.15);
         padding: 25px;
         margin: 20px 0;
         border-radius: 25px;
-        backdrop-filter: blur(14px);
-        box-shadow: 0 0 25px rgba(0,0,0,0.4);
-        transition: transform 0.3s, box-shadow 0.3s;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 0 30px rgba(0,0,0,0.4);
+        transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+        border: 1px solid rgba(255,255,255,0.3);
     }
 
     .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0 35px rgba(255,255,255,0.2);
+        transform: translateY(-6px);
+        box-shadow: 0 0 40px rgba(255,255,255,0.5);
+        background: rgba(255,255,255,0.2);
+    }
+
+    .emoji {
+        font-size: 2.8em;
+        margin-bottom: 6px;
+        filter: drop-shadow(0 0 6px rgba(255,255,255,0.6));
     }
 
     .value {
         font-size: 2.8em;
         font-weight: 700;
         margin-top: 10px;
-        text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        text-shadow: 0 0 15px rgba(255,255,255,0.4);
         animation: fadein 1.2s ease-out;
     }
 
@@ -56,37 +73,34 @@
         to { opacity: 1; transform: scale(1); }
     }
 
-    .emoji {
-        font-size: 2.5em;
-    }
-
-    /* Livestream Card */
+    /* LIVESTREAM CARD */
     .live-card {
-        background: rgba(255,0,0,0.15);
-        border-left: 5px solid #ff2a2a;
+        background: rgba(255, 50, 50, 0.25);
+        border-left: 6px solid #ff2a2a;
+        box-shadow: 0 0 20px rgba(255,0,0,0.6);
     }
 
     .live-btn {
         display: inline-block;
         margin-top: 15px;
         padding: 12px 25px;
-        background: #ff2a2a;
+        background: linear-gradient(135deg, #ff2a2a, #ff6a00);
         color: #fff;
         border-radius: 12px;
         text-decoration: none;
         font-weight: 600;
         font-size: 1.1em;
-        box-shadow: 0 0 12px rgba(255,0,0,0.4);
+        box-shadow: 0 0 15px rgba(255,80,0,0.5);
         transition: 0.2s;
     }
 
     .live-btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 18px rgba(255,0,0,0.7);
+        transform: scale(1.07);
+        box-shadow: 0 0 22px rgba(255,80,0,0.8);
     }
-
 </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -110,13 +124,12 @@
         <div id="videos" class="value">–</div>
     </div>
 
-    <!-- LIVESTREAM CARD -->
+    <!-- LIVESTREAM -->
     <div id="liveCard" class="card live-card">
         <div class="emoji" id="liveIcon">📡</div>
         <div id="liveStatus" class="value" style="font-size:2em;">Wird geladen…</div>
         <div id="liveLink"></div>
     </div>
-
 </div>
 
 <script>
@@ -131,8 +144,10 @@
 
                 document.getElementById("subs").textContent =
                     parseInt(stats.subscriberCount).toLocaleString();
+
                 document.getElementById("views").textContent =
                     parseInt(stats.viewCount).toLocaleString();
+
                 document.getElementById("videos").textContent =
                     parseInt(stats.videoCount).toLocaleString();
             });
@@ -147,14 +162,12 @@
                 const link = document.getElementById("liveLink");
 
                 if (data.items.length > 0) {
-                    // LIVE
                     const videoId = data.items[0].id.videoId;
 
                     status.textContent = "🔴 Du bist LIVE!";
                     icon.textContent = "🔥";
                     link.innerHTML = `<a class="live-btn" href="https://youtube.com/watch?v=${videoId}" target="_blank">Zum Livestream</a>`;
                 } else {
-                    // NICHT LIVE
                     status.textContent = "⚫ Zurzeit nicht live";
                     icon.textContent = "📡";
                     link.innerHTML = "";
