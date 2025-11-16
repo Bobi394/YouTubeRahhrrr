@@ -30,7 +30,6 @@
         text-align: center;
     }
 
-    /* Logo */
     .logo {
         width: 180px;
         height: 180px;
@@ -85,7 +84,6 @@
         to { opacity: 1; transform: scale(1); }
     }
 
-    /* Livestream Card */
     .live-card {
         background: rgba(0,255,120,0.25);
         border-left: 6px solid #00ff72;
@@ -115,9 +113,7 @@
 
 <body>
 <div class="container">
-    <!-- Rundes Logo -->
     <img src="https://raw.githubusercontent.com/Bobi394/YouTubeRahhrrr/refs/heads/main/IMG_5694.png" alt="Logo Energie_TV" class="logo" />
-    
     <h1>⚡ Energie_TV Dashboard</h1>
 
     <div class="card">
@@ -138,54 +134,79 @@
         <div id="videos" class="value">–</div>
     </div>
 
-    <!-- Livestream -->
+    <!-- Livestream + Countdown -->
     <div id="liveCard" class="card live-card">
         <div class="emoji" id="liveIcon">📡</div>
         <div id="liveStatus" class="value" style="font-size:2em;">Wird geladen…</div>
         <div id="liveLink"></div>
+        <div id="countdown" class="value" style="font-size:1.8em; margin-top:10px;">–</div>
     </div>
 </div>
 
 <script>
-    const API_KEY = "AIzaSyB946JgAit5jZ6SUBEDxgV91_9SsxgJVs8";
-    const CHANNEL_ID = "UCO2WbZs_ERYrTJyRc3rm3Eg";
+const API_KEY = "AIzaSyB946JgAit5jZ6SUBEDxgV91_9SsxgJVs8";
+const CHANNEL_ID = "UCO2WbZs_ERYrTJyRc3rm3Eg";
 
-    function updateStats() {
-        fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`)
-        .then(res => res.json())
-        .then(data => {
-            const stats = data.items[0].statistics;
-            document.getElementById("subs").textContent = parseInt(stats.subscriberCount).toLocaleString();
-            document.getElementById("views").textContent = parseInt(stats.viewCount).toLocaleString();
-            document.getElementById("videos").textContent = parseInt(stats.videoCount).toLocaleString();
-        })
-        .catch(err => console.error("Fehler beim Laden der Statistiken:", err));
+// Datum & Uhrzeit nächsten Streams eintragen
+const nextStream = new Date("2025-11-20T18:30:00"); // Jahr-Monat-TagTStunde:Minute:Sekunde
+
+function updateStats() {
+    fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`)
+    .then(res => res.json())
+    .then(data => {
+        const stats = data.items[0].statistics;
+        document.getElementById("subs").textContent = parseInt(stats.subscriberCount).toLocaleString();
+        document.getElementById("views").textContent = parseInt(stats.viewCount).toLocaleString();
+        document.getElementById("videos").textContent = parseInt(stats.videoCount).toLocaleString();
+    })
+    .catch(err => console.error("Fehler beim Laden der Statistiken:", err));
+}
+
+function checkLiveStatus() {
+    fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&key=${API_KEY}`)
+    .then(res => res.json())
+    .then(data => {
+        const status = document.getElementById("liveStatus");
+        const icon = document.getElementById("liveIcon");
+        const link = document.getElementById("liveLink");
+        const countdownEl = document.getElementById("countdown");
+
+        if (data.items.length > 0) {
+            const videoId = data.items[0].id.videoId;
+            status.textContent = "🟢 Du bist LIVE!";
+            icon.textContent = "✨";
+            link.innerHTML = `<a class="live-btn" href="https://youtube.com/watch?v=${videoId}" target="_blank">Zum Livestream</a>`;
+            countdownEl.textContent = ""; // Countdown ausblenden
+        } else {
+            status.textContent = "⚪ Nächster Stream:";
+            icon.textContent = "📡";
+            link.innerHTML = "";
+        }
+    })
+    .catch(err => console.error("Fehler beim Prüfen des Live-Status:", err));
+}
+
+function updateCountdown() {
+    const countdownEl = document.getElementById("countdown");
+    const now = new Date();
+    const diff = nextStream - now;
+
+    if(diff > 0){
+        const days = Math.floor(diff / (1000*60*60*24));
+        const hours = Math.floor((diff / (1000*60*60)) % 24);
+        const minutes = Math.floor((diff / (1000*60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+        countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    } else {
+        countdownEl.textContent = "🔴 LIVE!";
     }
+}
 
-    function checkLiveStatus() {
-        fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&key=${API_KEY}`)
-        .then(res => res.json())
-        .then(data => {
-            const status = document.getElementById("liveStatus");
-            const icon = document.getElementById("liveIcon");
-            const link = document.getElementById("liveLink");
-
-            if (data.items.length > 0) {
-                const videoId = data.items[0].id.videoId;
-                status.textContent = "🟢 Du bist LIVE!";
-                icon.textContent = "✨";
-                link.innerHTML = `<a class="live-btn" href="https://youtube.com/watch?v=${videoId}" target="_blank">Zum Livestream</a>`;
-            } else {
-                status.textContent = "⚪ Zurzeit nicht live";
-                icon.textContent = "📡";
-                link.innerHTML = "";
-            }
-        })
-        .catch(err => console.error("Fehler beim Prüfen des Live-Status:", err));
-    }
-
-    updateStats();
-    checkLiveStatus();
+updateStats();
+checkLiveStatus();
+updateCountdown();
+setInterval(updateCountdown, 1000);
+setInterval(checkLiveStatus, 30000); // prüft alle 30s auf LIVE
 </script>
 </body>
 </html>
