@@ -9,12 +9,12 @@
 
     body {
         font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #ff6a00, #ee0979, #4a00e0);
+        background: linear-gradient(135deg, #a0ffcb, #5ad1ff, #00c2ff);
         background-size: 300% 300%;
         animation: bgMove 12s ease infinite;
         margin: 0;
         padding: 0;
-        color: #fff;
+        color: #003b4a;
     }
 
     @keyframes bgMove {
@@ -34,37 +34,38 @@
         font-size: 3em;
         margin-bottom: 25px;
         font-weight: 700;
-        text-shadow: 0 0 25px rgba(255,255,255,0.4);
+        color: #003b4a;
+        text-shadow: 0 0 18px rgba(255,255,255,0.7);
     }
 
     .card {
-        background: rgba(255,255,255,0.15);
+        background: rgba(255,255,255,0.45);
         padding: 25px;
         margin: 20px 0;
         border-radius: 25px;
         backdrop-filter: blur(12px);
-        box-shadow: 0 0 30px rgba(0,0,0,0.4);
-        transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
-        border: 1px solid rgba(255,255,255,0.3);
+        box-shadow: 0 0 25px rgba(0,100,130,0.25);
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: 1px solid rgba(255,255,255,0.6);
     }
 
     .card:hover {
         transform: translateY(-6px);
-        box-shadow: 0 0 40px rgba(255,255,255,0.5);
-        background: rgba(255,255,255,0.2);
+        box-shadow: 0 0 35px rgba(0,150,190,0.35);
     }
 
     .emoji {
         font-size: 2.8em;
         margin-bottom: 6px;
-        filter: drop-shadow(0 0 6px rgba(255,255,255,0.6));
+        filter: drop-shadow(0 0 6px rgba(255,255,255,0.8));
     }
 
     .value {
         font-size: 2.8em;
         font-weight: 700;
         margin-top: 10px;
-        text-shadow: 0 0 15px rgba(255,255,255,0.4);
+        color: #003b4a;
+        text-shadow: 0 0 12px rgba(255,255,255,0.7);
         animation: fadein 1.2s ease-out;
     }
 
@@ -73,30 +74,30 @@
         to { opacity: 1; transform: scale(1); }
     }
 
-    /* LIVESTREAM CARD */
+    /* Livestream Card */
     .live-card {
-        background: rgba(255, 50, 50, 0.25);
-        border-left: 6px solid #ff2a2a;
-        box-shadow: 0 0 20px rgba(255,0,0,0.6);
+        background: rgba(0,255,120,0.25);
+        border-left: 6px solid #00ff72;
+        box-shadow: 0 0 20px rgba(0,255,90,0.4);
     }
 
     .live-btn {
         display: inline-block;
         margin-top: 15px;
         padding: 12px 25px;
-        background: linear-gradient(135deg, #ff2a2a, #ff6a00);
-        color: #fff;
+        background: linear-gradient(135deg, #00ff9c, #00c4ff);
+        color: #003b4a;
         border-radius: 12px;
         text-decoration: none;
         font-weight: 600;
         font-size: 1.1em;
-        box-shadow: 0 0 15px rgba(255,80,0,0.5);
+        box-shadow: 0 0 15px rgba(0,255,160,0.4);
         transition: 0.2s;
     }
 
     .live-btn:hover {
         transform: scale(1.07);
-        box-shadow: 0 0 22px rgba(255,80,0,0.8);
+        box-shadow: 0 0 20px rgba(0,255,180,0.7);
     }
 </style>
 </head>
@@ -124,7 +125,6 @@
         <div id="videos" class="value">–</div>
     </div>
 
-    <!-- LIVESTREAM -->
     <div id="liveCard" class="card live-card">
         <div class="emoji" id="liveIcon">📡</div>
         <div id="liveStatus" class="value" style="font-size:2em;">Wird geladen…</div>
@@ -164,11 +164,11 @@
                 if (data.items.length > 0) {
                     const videoId = data.items[0].id.videoId;
 
-                    status.textContent = "🔴 Du bist LIVE!";
-                    icon.textContent = "🔥";
+                    status.textContent = "🟢 Du bist LIVE!";
+                    icon.textContent = "✨";
                     link.innerHTML = `<a class="live-btn" href="https://youtube.com/watch?v=${videoId}" target="_blank">Zum Livestream</a>`;
                 } else {
-                    status.textContent = "⚫ Zurzeit nicht live";
+                    status.textContent = "⚪ Zurzeit nicht live";
                     icon.textContent = "📡";
                     link.innerHTML = "";
                 }
