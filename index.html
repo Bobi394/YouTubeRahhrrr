@@ -2,82 +2,86 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Energie_TV – Live Stats</title>
+<title>Energie_TV – Dashboard</title>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
 
     body {
-        font-family: 'Roboto', sans-serif;
-        background: linear-gradient(135deg, #1e3c72, #2a5298);
-        color: #fff;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
         margin: 0;
         padding: 0;
+        color: #fff;
     }
 
     .container {
-        max-width: 600px;
-        margin: 50px auto;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        max-width: 700px;
+        margin: 60px auto;
+        padding: 20px;
         text-align: center;
     }
 
     h1 {
-        font-size: 2.5em;
-        margin-bottom: 30px;
-        text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+        font-size: 3em;
+        margin-bottom: 25px;
+        font-weight: 700;
+        text-shadow: 0 0 20px rgba(255,255,255,0.3);
     }
 
-    .stat {
+    .card {
+        background: rgba(255,255,255,0.08);
+        padding: 25px;
         margin: 20px 0;
-        text-align: left;
+        border-radius: 25px;
+        backdrop-filter: blur(14px);
+        box-shadow: 0 0 25px rgba(0,0,0,0.4);
+        transition: transform 0.3s, box-shadow 0.3s;
     }
 
-    .stat-name {
-        font-weight: bold;
-        margin-bottom: 5px;
-        font-size: 1.1em;
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 35px rgba(255,255,255,0.2);
     }
 
-    .bar {
-        height: 25px;
-        width: 0;
-        border-radius: 12px;
-        background: linear-gradient(90deg, #ff512f, #dd2476);
-        text-align: right;
-        padding-right: 10px;
-        line-height: 25px;
-        color: #fff;
-        font-weight: bold;
-        transition: width 1.5s ease-in-out;
+    .value {
+        font-size: 2.8em;
+        font-weight: 700;
+        margin-top: 10px;
+        text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        animation: fadein 1.2s ease-out;
     }
 
-    .icon {
-        margin-right: 10px;
+    @keyframes fadein {
+        from { opacity: 0; transform: scale(0.8); }
+        to { opacity: 1; transform: scale(1); }
     }
 
+    .emoji {
+        font-size: 2.5em;
+    }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>⚡ Energie_TV Stats</h1>
+    <h1>⚡ Energie_TV Dashboard</h1>
 
-    <div class="stat">
-        <div class="stat-name">🔔 Abonnenten</div>
-        <div id="subsBar" class="bar">0</div>
+    <div class="card">
+        <div class="emoji">🔔</div>
+        <div class="title">Abonnenten</div>
+        <div id="subs" class="value">–</div>
     </div>
 
-    <div class="stat">
-        <div class="stat-name">▶️ Gesamtaufrufe</div>
-        <div id="viewsBar" class="bar">0</div>
+    <div class="card">
+        <div class="emoji">▶️</div>
+        <div class="title">Gesamtaufrufe</div>
+        <div id="views" class="value">–</div>
     </div>
 
-    <div class="stat">
-        <div class="stat-name">🎥 Videos</div>
-        <div id="videosBar" class="bar">0</div>
+    <div class="card">
+        <div class="emoji">🎥</div>
+        <div class="title">Videos</div>
+        <div id="videos" class="value">–</div>
     </div>
 </div>
 
@@ -85,34 +89,23 @@
     const API_KEY = "AIzaSyB946JgAit5jZ6SUBEDxgV91_9SsxgJVs8";
     const CHANNEL_ID = "UCO2WbZs_ERYrTJyRc3rm3Eg";
 
-    fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`)
-        .then(res => res.json())
-        .then(data => {
-            const stats = data.items[0].statistics;
+    function updateStats() {
+        fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`)
+            .then(res => res.json())
+            .then(data => {
+                const stats = data.items[0].statistics;
 
-            // Werte holen
-            const subs = parseInt(stats.subscriberCount);
-            const views = parseInt(stats.viewCount);
-            const videos = parseInt(stats.videoCount);
+                document.getElementById("subs").textContent =
+                    parseInt(stats.subscriberCount).toLocaleString();
+                document.getElementById("views").textContent =
+                    parseInt(stats.viewCount).toLocaleString();
+                document.getElementById("videos").textContent =
+                    parseInt(stats.videoCount).toLocaleString();
+            })
+            .catch(err => console.error(err));
+    }
 
-            // Maximalwert für Balken
-            const maxValue = Math.max(subs, views, videos);
-
-            // Balken setzen
-            const subsBar = document.getElementById('subsBar');
-            const viewsBar = document.getElementById('viewsBar');
-            const videosBar = document.getElementById('videosBar');
-
-            subsBar.style.width = `${(subs/maxValue)*100}%`;
-            subsBar.textContent = subs.toLocaleString();
-
-            viewsBar.style.width = `${(views/maxValue)*100}%`;
-            viewsBar.textContent = views.toLocaleString();
-
-            videosBar.style.width = `${(videos/maxValue)*100}%`;
-            videosBar.textContent = videos.toLocaleString();
-        })
-        .catch(err => console.error(err));
+    updateStats();
 </script>
 
 </body>
