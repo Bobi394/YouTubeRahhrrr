@@ -122,6 +122,16 @@
         <div id="subs" class="value">–</div>
     </div>
 
+    <!-- Abonnenten-Fortschritt -->
+    <div class="card">
+        <div class="emoji">📈</div>
+        <div>Abonnenten-Fortschritt</div>
+        <div id="progressContainer" style="background: rgba(0,255,150,0.2); border-radius: 15px; height: 30px; margin-top:10px;">
+            <div id="progressBar" style="background: #00ff72; height: 100%; width: 0%; border-radius: 15px; transition: width 1s;"></div>
+        </div>
+        <div id="progressText" style="margin-top:8px; font-weight:700; color:#003b4a;">0 / 100</div>
+    </div>
+
     <div class="card">
         <div class="emoji">▶️</div>
         <div>Gesamtaufrufe</div>
@@ -147,17 +157,31 @@
 const API_KEY = "AIzaSyB946JgAit5jZ6SUBEDxgV91_9SsxgJVs8";
 const CHANNEL_ID = "UCO2WbZs_ERYrTJyRc3rm3Eg";
 
-// Datum & Uhrzeit nächsten Streams eintragen
-const nextStream = new Date("2025-11-20T18:30:00"); // Jahr-Monat-TagTStunde:Minute:Sekunde
+// Nächstes Stream-Datum eintragen
+const nextStream = new Date("2025-11-20T18:30:00"); 
+
+const targetAbos = 100; // Abo-Ziel für Fortschrittsbalken
 
 function updateStats() {
     fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`)
     .then(res => res.json())
     .then(data => {
         const stats = data.items[0].statistics;
-        document.getElementById("subs").textContent = parseInt(stats.subscriberCount).toLocaleString();
+        const subs = parseInt(stats.subscriberCount);
+        document.getElementById("subs").textContent = subs.toLocaleString();
         document.getElementById("views").textContent = parseInt(stats.viewCount).toLocaleString();
         document.getElementById("videos").textContent = parseInt(stats.videoCount).toLocaleString();
+
+        // Abonnenten-Fortschritt aktualisieren
+        const progress = Math.min((subs / targetAbos) * 100, 100);
+        document.getElementById("progressBar").style.width = progress + "%";
+        document.getElementById("progressText").textContent = `${subs} / ${targetAbos}`;
+
+        // Optional kleiner Effekt, wenn Ziel erreicht
+        if(subs >= targetAbos){
+            document.getElementById("progressBar").style.boxShadow = "0 0 20px 5px rgba(0,255,150,0.8)";
+            setTimeout(()=>{document.getElementById("progressBar").style.boxShadow="";},1500);
+        }
     })
     .catch(err => console.error("Fehler beim Laden der Statistiken:", err));
 }
@@ -176,7 +200,7 @@ function checkLiveStatus() {
             status.textContent = "🟢 Du bist LIVE!";
             icon.textContent = "✨";
             link.innerHTML = `<a class="live-btn" href="https://youtube.com/watch?v=${videoId}" target="_blank">Zum Livestream</a>`;
-            countdownEl.textContent = ""; // Countdown ausblenden
+            countdownEl.textContent = "";
         } else {
             status.textContent = "⚪ Nächster Stream:";
             icon.textContent = "📡";
@@ -205,6 +229,7 @@ function updateCountdown() {
 updateStats();
 checkLiveStatus();
 updateCountdown();
+setInterval(updateStats, 15000); // alle 15s aktualisieren
 setInterval(updateCountdown, 1000);
 setInterval(checkLiveStatus, 30000); // prüft alle 30s auf LIVE
 </script>
